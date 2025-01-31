@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_app/data/categories.dart';
+import 'package:shopping_app/models/category.dart';
 
 class NewItemScreen extends StatefulWidget {
   const NewItemScreen({super.key});
@@ -9,6 +10,21 @@ class NewItemScreen extends StatefulWidget {
 }
 
 class _NewItemScreenState extends State<NewItemScreen> {
+  final _formKey = GlobalKey<FormState>();
+  var _enteredName = '';
+  var _enteredQuantity = 1;
+  var _selectedCategory = categories[Categories.vegetables];
+
+  // Function that will be executed when Add Item button has been clicked
+  saveItem() {
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+    }
+    print(_enteredName);
+    print(_selectedCategory?.title);
+    print(_enteredQuantity);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -18,6 +34,7 @@ class _NewItemScreenState extends State<NewItemScreen> {
       body: Padding(
         padding: const EdgeInsets.all(12.0),
         child: Form(
+          key: _formKey,
           child: Column(
             children: [
               TextFormField(
@@ -26,7 +43,16 @@ class _NewItemScreenState extends State<NewItemScreen> {
                   label: Text("Name"),
                 ),
                 validator: (value) {
-                  return "Demo";
+                  if (value == null ||
+                      value.isEmpty ||
+                      value.trim().length <= 1 ||
+                      value.trim().length > 50) {
+                    return "Must be between 1 and 50 characters";
+                  }
+                  return null;
+                },
+                onSaved: (value) {
+                  _enteredName = value!;
                 },
               ),
               Row(
@@ -39,6 +65,18 @@ class _NewItemScreenState extends State<NewItemScreen> {
                         label: Text("Quantity"),
                       ),
                       initialValue: '1',
+                      validator: (value) {
+                        if (value == null ||
+                            value.isEmpty ||
+                            int.tryParse(value)! <= 0) {
+                          return "Please enter a valid number";
+                        }
+                        return null;
+                      },
+                      keyboardType: TextInputType.number,
+                      onSaved: (value) {
+                        _enteredQuantity = int.parse(value!);
+                      },
                     ),
                   ),
                   SizedBox(
@@ -46,6 +84,7 @@ class _NewItemScreenState extends State<NewItemScreen> {
                   ),
                   Expanded(
                     child: DropdownButtonFormField(
+                      value: _selectedCategory,
                       items: [
                         for (final category in categories.entries)
                           DropdownMenuItem(
@@ -65,11 +104,36 @@ class _NewItemScreenState extends State<NewItemScreen> {
                             ),
                           )
                       ],
-                      onChanged: (value) {},
+                      onChanged: (value) {
+                        setState(() {
+                          _selectedCategory = value;
+                        });
+                      },
                     ),
                   ),
                 ],
               ),
+              SizedBox(
+                height: 13,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      _formKey.currentState!.reset();
+                    },
+                    child: Text("Reset"),
+                  ),
+                  SizedBox(
+                    width: 5,
+                  ),
+                  ElevatedButton(
+                    onPressed: saveItem,
+                    child: Text("Add Item"),
+                  )
+                ],
+              )
             ],
           ),
         ),
