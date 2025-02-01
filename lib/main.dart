@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_app/screens/home_screen.dart';
+// import 'package:shopping_app/providers/grocery_items_list_provider.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+    ProviderScope(
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

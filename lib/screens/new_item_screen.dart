@@ -1,28 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:shopping_app/data/categories.dart';
 import 'package:shopping_app/models/category.dart';
+import 'package:shopping_app/models/grocery_item.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shopping_app/providers/grocery_items_list_provider.dart';
 
-class NewItemScreen extends StatefulWidget {
+class NewItemScreen extends ConsumerStatefulWidget {
   const NewItemScreen({super.key});
 
   @override
-  State<NewItemScreen> createState() => _NewItemScreenState();
+  ConsumerState<NewItemScreen> createState() => _NewItemScreenState();
 }
 
-class _NewItemScreenState extends State<NewItemScreen> {
+class _NewItemScreenState extends ConsumerState<NewItemScreen> {
   final _formKey = GlobalKey<FormState>();
   var _enteredName = '';
   var _enteredQuantity = 1;
-  var _selectedCategory = categories[Categories.vegetables];
+  var _selectedCategory = categories[Categories.vegetables]!;
 
   // Function that will be executed when Add Item button has been clicked
   saveItem() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
+      ref.read(groceryItemsListProvider.notifier).addItem(GroceryItem(
+            id: DateTime.now().toString(),
+            name: _enteredName,
+            quantity: _enteredQuantity,
+            category: _selectedCategory,
+          ));
+
+      // Navigator.pop(
+      //   context,
+      //   GroceryItem(
+      //     id: DateTime.now().toString(),
+      //     name: _enteredName,
+      //     quantity: _enteredQuantity,
+      //     category: _selectedCategory,
+      //   ),
+      // );
+
+      Navigator.pop(context);
     }
-    print(_enteredName);
-    print(_selectedCategory?.title);
-    print(_enteredQuantity);
+    // print(_enteredName);
+    // print(_selectedCategory?.title);
+    // print(_enteredQuantity);
   }
 
   @override
@@ -106,7 +128,7 @@ class _NewItemScreenState extends State<NewItemScreen> {
                       ],
                       onChanged: (value) {
                         setState(() {
-                          _selectedCategory = value;
+                          _selectedCategory = value!;
                         });
                       },
                     ),
