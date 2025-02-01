@@ -11,6 +11,12 @@ class GroceryItemsListProvider extends StateNotifier<List<GroceryItem>> {
   void removeItem(GroceryItem item) {
     state = state.where((singleItem) => singleItem != item).toList();
   }
+
+  void undoRemoveItem(GroceryItem oldItem, int index) {
+    final newItemList = [...state];
+    newItemList.insert(index, oldItem);
+    state = newItemList;
+  }
 }
 
 final groceryItemsListProvider =

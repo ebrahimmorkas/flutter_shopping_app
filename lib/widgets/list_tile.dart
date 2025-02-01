@@ -17,16 +17,28 @@ class _ListtileState extends ConsumerState<Listtile> {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: ValueKey(widget.index),
+      key: ValueKey(widget.groceryItem.id),
       background: Container(
         color: const Color.fromARGB(208, 208, 158, 158),
       ),
       onDismissed: (direction) {
-        ref
-            .read(groceryItemsListProvider.notifier)
-            .removeItem(widget.groceryItem);
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text("Item Deleted")));
+        final itemToBeDeleted = widget.groceryItem;
+        final indexOfItemToBeDeleted = widget.index;
+        final groceryNotifier = ref.read(groceryItemsListProvider.notifier);
+
+        groceryNotifier.removeItem(widget.groceryItem);
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Item Deleted"),
+            action: SnackBarAction(
+                label: "Undo",
+                onPressed: () {
+                  groceryNotifier.undoRemoveItem(
+                      itemToBeDeleted, indexOfItemToBeDeleted);
+                }),
+          ),
+        );
       },
       child: ListTile(
         leading: Container(
