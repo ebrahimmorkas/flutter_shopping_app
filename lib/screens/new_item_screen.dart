@@ -144,6 +144,7 @@ class _NewItemScreenState extends ConsumerState<NewItemScreen> {
                   TextButton(
                     onPressed: () {
                       _formKey.currentState!.reset();
+                      _selectedCategory = categories[Categories.vegetables]!;
                     },
                     child: Text("Reset"),
                   ),
