@@ -4,6 +4,8 @@ import 'package:shopping_app/models/category.dart';
 import 'package:shopping_app/models/grocery_item.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shopping_app/providers/grocery_items_list_provider.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class NewItemScreen extends ConsumerStatefulWidget {
   const NewItemScreen({super.key});
@@ -22,6 +24,17 @@ class _NewItemScreenState extends ConsumerState<NewItemScreen> {
   saveItem() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
+      final url = Uri.https('shopping-list-7df26-default-rtdb.firebaseio.com',
+          'shopping_list.json');
+      // https://shopping-list-7df26-default-rtdb.firebaseio.com/
+      http.post(url,
+          body: jsonEncode({
+            'name': _enteredName,
+            'quantity': _enteredQuantity,
+            'category': _selectedCategory.title
+          }),
+          headers: {'Content-Type': 'application/json'});
 
       ref.read(groceryItemsListProvider.notifier).addItem(GroceryItem(
             id: DateTime.now().toString(),
