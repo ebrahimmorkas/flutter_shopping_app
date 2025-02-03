@@ -15,18 +15,37 @@ class Listtile extends ConsumerStatefulWidget {
 }
 
 class _ListtileState extends ConsumerState<Listtile> {
-  Future deleteFromDatabase(String id) async {
-    final url = Uri.https('shopping-list-7df26-default-rtdb.firebaseio.com',
+  Future deleteFromDatabase(
+      String id,
+      GroceryItem itemToBeDeleted,
+      int indexOfItemToBeDeleted,
+      GroceryItemsListProvider groceryNotifier) async {
+    final url = Uri.https('hopping-list-7df26-default-rtdb.firebaseio.com',
         'shopping_list/$id.json');
     try {
       final response = await http.delete(url);
       if (response.statusCode == 200) {
         // Request is proper
+      } else {
+        undoDeletion(itemToBeDeleted, indexOfItemToBeDeleted, groceryNotifier);
+        ScaffoldMessenger.of(context).removeCurrentSnackBar();
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Item not deleted")));
       }
     } catch (error) {
       // Error has taken place
       return;
     }
+  }
+
+  Future updateItem(GroceryItem item) async {
+    // final url = Uri.https('shopping-list-7df26-default-rtdb.firebaseio.com',
+    //     'shopping_list/${item.id}.json');
+  }
+
+  void undoDeletion(GroceryItem itemToBeDeleted, int indexOfItemToBeDeleted,
+      GroceryItemsListProvider groceryNotifier) {
+    groceryNotifier.undoRemoveItem(itemToBeDeleted, indexOfItemToBeDeleted);
   }
 
   @override
@@ -38,6 +57,7 @@ class _ListtileState extends ConsumerState<Listtile> {
       ),
       onDismissed: (direction) {
         // The loic for deleting the data from database is simple with the help of delete request. But the logic for undo is as followed. When user swipes the item the item is removed from the UI but not from database. It is removed from the database when the snakcbar on the screen is removed. But when the snackbar is removed from the screen by clicking on action button that is 'undo' in our case then the data is not removed from database. The query for removing the data from database will only process when the snackbar is removed from the screen but not by clicking on action button that is 'undo' in our case.
+
         final itemToBeDeleted = widget.groceryItem;
         final indexOfItemToBeDeleted = widget.index;
         final groceryNotifier = ref.read(groceryItemsListProvider.notifier);
@@ -54,8 +74,11 @@ class _ListtileState extends ConsumerState<Listtile> {
             action: SnackBarAction(
                 label: "Undo",
                 onPressed: () {
-                  groceryNotifier.undoRemoveItem(
-                      itemToBeDeleted, indexOfItemToBeDeleted);
+                  undoDeletion(
+                      itemToBeDeleted, indexOfItemToBeDeleted, groceryNotifier);
+
+                  // groceryNotifier.undoRemoveItem(
+                  //     itemToBeDeleted, indexOfItemToBeDeleted);
                 }),
           ),
         );
@@ -68,7 +91,8 @@ class _ListtileState extends ConsumerState<Listtile> {
               return;
             } else {
               // print(reason);
-              deleteFromDatabase(itemToBeDeleted.id);
+              deleteFromDatabase(itemToBeDeleted.id, itemToBeDeleted,
+                  indexOfItemToBeDeleted, groceryNotifier);
             }
           },
         );
@@ -79,7 +103,21 @@ class _ListtileState extends ConsumerState<Listtile> {
           color: widget.groceryItem.category.color,
         ),
         title: Text(widget.groceryItem.name),
-        trailing: Text(widget.groceryItem.quantity.toString()),
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(widget.groceryItem.quantity.toString()),
+            SizedBox(
+              width: 15,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                updateItem(widget.groceryItem);
+              },
+              child: Text('Update'),
+            ),
+          ],
+        ),
       ),
     );
   }
