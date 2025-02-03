@@ -14,11 +14,22 @@ class HomeScreen extends ConsumerStatefulWidget {
 }
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
+  bool isLoading = true;
   @override
   void initState() {
     super.initState();
-    ref.read(groceryItemsListProvider.notifier).fetchData();
   }
+
+  void fetchData() async {
+    setState(() {
+      isLoading = true;
+    });
+    await ref.read(groceryItemsListProvider.notifier).fetchData();
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   // List groceryItems = [];
 
   @override
@@ -29,35 +40,35 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         title: Text("Your Groceries"),
         actions: [
           IconButton(
-            onPressed: () async {
-              final newItem = await Navigator.push<GroceryItem>(
+            onPressed: () {
+              Navigator.push<GroceryItem>(
                 context,
                 MaterialPageRoute(
                   builder: (context) => NewItemScreen(),
                 ),
               );
-
-              if (newItem == null) {
-                return;
-              } else {
-                setState(() {
-                  groceryItems.add(newItem);
-                });
-              }
             },
             icon: Icon(Icons.add),
           ),
         ],
       ),
       body: groceryItems.isEmpty
-          ? Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Nothing to show here"),
-                  SizedBox(height: 8),
-                  Text("Get started by adding the items"),
-                ],
+          ?
+          // Center(
+          //     child: Column(
+          //       mainAxisAlignment: MainAxisAlignment.center,
+          //       children: [
+          //         Text("Nothing to show here"),
+          //         SizedBox(height: 8),
+          //         Text("Get started by adding the items"),
+          //       ],
+          //     ),
+          //   )
+          Center(
+              child: SizedBox(
+                width: 16,
+                height: 16,
+                child: CircularProgressIndicator(),
               ),
             )
           : ListView.builder(
