@@ -1,8 +1,39 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shopping_app/models/category.dart';
 import 'package:shopping_app/models/grocery_item.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter/material.dart';
 
 class GroceryItemsListProvider extends StateNotifier<List<GroceryItem>> {
-  GroceryItemsListProvider() : super([]);
+  GroceryItemsListProvider() : super([]) {
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    final url = Uri.https('shopping-list-7df26-default-rtdb.firebaseio.com',
+        'shopping_list.json');
+    try {
+      final response = await http.get(url);
+      final Map<String, dynamic> data = jsonDecode(response.body);
+      final List<GroceryItem> loadedItems = [];
+      for (var data in data.entries) {
+        loadedItems.add(
+          GroceryItem(
+            id: data.key,
+            name: data.value['name'],
+            quantity: data.value['quantity'],
+            category:
+                Category(title: data.value['category'], color: Colors.black45),
+          ),
+        );
+      }
+
+      state = loadedItems;
+    } catch (error) {
+      print("An error has taken place $error");
+    }
+  }
 
   void addItem(GroceryItem newItem) {
     state = [...state, newItem];

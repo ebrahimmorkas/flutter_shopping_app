@@ -36,12 +36,12 @@ class _NewItemScreenState extends ConsumerState<NewItemScreen> {
           }),
           headers: {'Content-Type': 'application/json'});
 
-      ref.read(groceryItemsListProvider.notifier).addItem(GroceryItem(
-            id: DateTime.now().toString(),
-            name: _enteredName,
-            quantity: _enteredQuantity,
-            category: _selectedCategory,
-          ));
+      // ref.read(groceryItemsListProvider.notifier).addItem(GroceryItem(
+      //       id: DateTime.now().toString(),
+      //       name: _enteredName,
+      //       quantity: _enteredQuantity,
+      //       category: _selectedCategory,
+      //     ));
 
       // Navigator.pop(
       //   context,
@@ -53,10 +53,12 @@ class _NewItemScreenState extends ConsumerState<NewItemScreen> {
       //   ),
       // );
 
-      if (!context.mounted) {
+      if (!context.mounted && response.statusCode == 200) {
+        ref.read(groceryItemsListProvider.notifier).fetchData();
         return;
       }
-      print(response);
+      // print(response);
+      ref.read(groceryItemsListProvider.notifier).fetchData();
       Navigator.pop(context);
     }
     // print(_enteredName);
