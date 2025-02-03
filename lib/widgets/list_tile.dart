@@ -33,14 +33,18 @@ class _ListtileState extends ConsumerState<Listtile> {
         color: const Color.fromARGB(208, 208, 158, 158),
       ),
       onDismissed: (direction) {
+        // The loic for deleting the data from database is simple with the help of delete request. But the logic for undo is as followed. When user swipes the item the item is removed from the UI but not from database. It is removed from the database when the snakcbar on the screen is removed. But when the snackbar is removed from the screen by clicking on action button that is 'undo' in our case then the data is not removed from database. The query for removing the data from database will only process when the snackbar is removed from the screen but not by clicking on action button that is 'undo' in our case.
         final itemToBeDeleted = widget.groceryItem;
         final indexOfItemToBeDeleted = widget.index;
         final groceryNotifier = ref.read(groceryItemsListProvider.notifier);
-        deleteFromDatabase(itemToBeDeleted.id);
 
         groceryNotifier.removeItem(widget.groceryItem);
-        ScaffoldMessenger.of(context).removeCurrentSnackBar();
-        ScaffoldMessenger.of(context).showSnackBar(
+
+// We are assigning the variables for the snackbar because we want to handle the event when the snackbar is removed from the screen
+        final scaffoldMessenger = ScaffoldMessenger.of(context);
+        // Removing the snackbar if there are any
+        scaffoldMessenger.removeCurrentSnackBar();
+        final snackBarController = scaffoldMessenger.showSnackBar(
           SnackBar(
             content: Text("Item Deleted"),
             action: SnackBarAction(
@@ -50,6 +54,19 @@ class _ListtileState extends ConsumerState<Listtile> {
                       itemToBeDeleted, indexOfItemToBeDeleted);
                 }),
           ),
+        );
+
+        snackBarController.closed.then(
+          (reason) {
+            if (reason == SnackBarClosedReason.action) {
+              // Undo has been clicked so no need to delete the item
+              // print(reason);
+              return;
+            } else {
+              // print(reason);
+              deleteFromDatabase(itemToBeDeleted.id);
+            }
+          },
         );
       },
       child: ListTile(
