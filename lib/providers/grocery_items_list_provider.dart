@@ -4,6 +4,7 @@ import 'package:shopping_app/models/grocery_item.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:shopping_app/data/categories.dart';
 
 class GroceryItemsListProvider extends StateNotifier<List<GroceryItem>> {
   GroceryItemsListProvider() : super([]) {
@@ -23,15 +24,25 @@ class GroceryItemsListProvider extends StateNotifier<List<GroceryItem>> {
             id: data.key,
             name: data.value['name'],
             quantity: data.value['quantity'],
-            category:
-                Category(title: data.value['category'], color: Colors.black45),
+            category: Category(
+                title: data.value['category'],
+                // The below code is for selecting the color.
+                // The logic is that with the help of firstWhere() methid we are returning only that value form the map of categories which is stored is categories.dart file in data folder that matches the title stored in firebase.
+                color: categories.entries
+                    .firstWhere(
+                      (catItem) {
+                        return catItem.value.title == data.value['category'];
+                      },
+                    )
+                    .value
+                    .color),
           ),
         );
       }
 
       state = loadedItems;
     } catch (error) {
-      print("An error has taken place $error");
+      // print("An error has taken place $error");
     }
   }
 

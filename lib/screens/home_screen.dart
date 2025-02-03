@@ -16,7 +16,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     ref.read(groceryItemsListProvider.notifier).fetchData();
   }
