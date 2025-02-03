@@ -15,6 +15,7 @@ class NewItemScreen extends ConsumerStatefulWidget {
 }
 
 class _NewItemScreenState extends ConsumerState<NewItemScreen> {
+  bool isSaved = false;
   final _formKey = GlobalKey<FormState>();
   var _enteredName = '';
   var _enteredQuantity = 1;
@@ -24,6 +25,9 @@ class _NewItemScreenState extends ConsumerState<NewItemScreen> {
   saveItem() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+      setState(() {
+        isSaved = true;
+      });
 
       final url = Uri.https('shopping-list-7df26-default-rtdb.firebaseio.com',
           'shopping_list.json');
@@ -58,6 +62,7 @@ class _NewItemScreenState extends ConsumerState<NewItemScreen> {
         return;
       }
       // print(response);
+
       ref.read(groceryItemsListProvider.notifier).fetchData();
       Navigator.pop(context);
     }
@@ -161,18 +166,21 @@ class _NewItemScreenState extends ConsumerState<NewItemScreen> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   TextButton(
-                    onPressed: () {
-                      _formKey.currentState!.reset();
-                      _selectedCategory = categories[Categories.vegetables]!;
-                    },
+                    onPressed: !isSaved
+                        ? () {
+                            _formKey.currentState!.reset();
+                            _selectedCategory =
+                                categories[Categories.vegetables]!;
+                          }
+                        : null,
                     child: Text("Reset"),
                   ),
                   SizedBox(
                     width: 5,
                   ),
                   ElevatedButton(
-                    onPressed: saveItem,
-                    child: Text("Add Item"),
+                    onPressed: !isSaved ? saveItem : null,
+                    child: !isSaved ? Text("Add Item") : Text("Saving..."),
                   )
                 ],
               )
