@@ -18,10 +18,14 @@ class _ListtileState extends ConsumerState<Listtile> {
   Future deleteFromDatabase(String id) async {
     final url = Uri.https('shopping-list-7df26-default-rtdb.firebaseio.com',
         'shopping_list/$id.json');
-
-    final response = await http.delete(url);
-    if (response.statusCode == 200) {
-      print("Deletion successfull");
+    try {
+      final response = await http.delete(url);
+      if (response.statusCode == 200) {
+        // Request is proper
+      }
+    } catch (error) {
+      // Error has taken place
+      return;
     }
   }
 

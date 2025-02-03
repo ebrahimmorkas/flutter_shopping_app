@@ -32,33 +32,38 @@ class _NewItemScreenState extends ConsumerState<NewItemScreen> {
       final url = Uri.https('shopping-list-7df26-default-rtdb.firebaseio.com',
           'shopping_list.json');
       // https://shopping-list-7df26-default-rtdb.firebaseio.com/
-      final response = await http.post(url,
-          body: jsonEncode({
-            'name': _enteredName,
-            'quantity': _enteredQuantity,
-            'category': _selectedCategory.title
-          }),
-          headers: {'Content-Type': 'application/json'});
+      try {
+        final response = await http.post(url,
+            body: jsonEncode({
+              'name': _enteredName,
+              'quantity': _enteredQuantity,
+              'category': _selectedCategory.title
+            }),
+            headers: {'Content-Type': 'application/json'});
 
-      // ref.read(groceryItemsListProvider.notifier).addItem(GroceryItem(
-      //       id: DateTime.now().toString(),
-      //       name: _enteredName,
-      //       quantity: _enteredQuantity,
-      //       category: _selectedCategory,
-      //     ));
+        // ref.read(groceryItemsListProvider.notifier).addItem(GroceryItem(
+        //       id: DateTime.now().toString(),
+        //       name: _enteredName,
+        //       quantity: _enteredQuantity,
+        //       category: _selectedCategory,
+        //     ));
 
-      // Navigator.pop(
-      //   context,
-      //   GroceryItem(
-      //     id: DateTime.now().toString(),
-      //     name: _enteredName,
-      //     quantity: _enteredQuantity,
-      //     category: _selectedCategory,
-      //   ),
-      // );
+        // Navigator.pop(
+        //   context,
+        //   GroceryItem(
+        //     id: DateTime.now().toString(),
+        //     name: _enteredName,
+        //     quantity: _enteredQuantity,
+        //     category: _selectedCategory,
+        //   ),
+        // );
 
-      if (!context.mounted && response.statusCode == 200) {
-        ref.read(groceryItemsListProvider.notifier).fetchData();
+        if (!context.mounted && response.statusCode == 200) {
+          ref.read(groceryItemsListProvider.notifier).fetchData();
+          return;
+        }
+      } catch (error) {
+        // An error has taken place
         return;
       }
       // print(response);
