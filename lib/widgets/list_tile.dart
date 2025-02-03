@@ -20,7 +20,7 @@ class _ListtileState extends ConsumerState<Listtile> {
       GroceryItem itemToBeDeleted,
       int indexOfItemToBeDeleted,
       GroceryItemsListProvider groceryNotifier) async {
-    final url = Uri.https('hopping-list-7df26-default-rtdb.firebaseio.com',
+    final url = Uri.https('shopping-list-7df26-default-rtdb.firebaseio.com',
         'shopping_list/$id.json');
     try {
       final response = await http.delete(url);
