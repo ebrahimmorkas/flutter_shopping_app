@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shopping_app/models/grocery_item.dart';
 import 'package:shopping_app/providers/grocery_items_list_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 class Listtile extends ConsumerStatefulWidget {
   const Listtile({super.key, required this.groceryItem, required this.index});
@@ -14,6 +15,16 @@ class Listtile extends ConsumerStatefulWidget {
 }
 
 class _ListtileState extends ConsumerState<Listtile> {
+  Future deleteFromDatabase(String id) async {
+    final url = Uri.https('shopping-list-7df26-default-rtdb.firebaseio.com',
+        'shopping_list/$id.json');
+
+    final response = await http.delete(url);
+    if (response.statusCode == 200) {
+      print("Deletion successfull");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dismissible(
@@ -25,6 +36,7 @@ class _ListtileState extends ConsumerState<Listtile> {
         final itemToBeDeleted = widget.groceryItem;
         final indexOfItemToBeDeleted = widget.index;
         final groceryNotifier = ref.read(groceryItemsListProvider.notifier);
+        deleteFromDatabase(itemToBeDeleted.id);
 
         groceryNotifier.removeItem(widget.groceryItem);
         ScaffoldMessenger.of(context).removeCurrentSnackBar();
