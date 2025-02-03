@@ -21,14 +21,14 @@ class _NewItemScreenState extends ConsumerState<NewItemScreen> {
   var _selectedCategory = categories[Categories.vegetables]!;
 
   // Function that will be executed when Add Item button has been clicked
-  saveItem() {
+  saveItem() async {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
 
       final url = Uri.https('shopping-list-7df26-default-rtdb.firebaseio.com',
           'shopping_list.json');
       // https://shopping-list-7df26-default-rtdb.firebaseio.com/
-      http.post(url,
+      final response = await http.post(url,
           body: jsonEncode({
             'name': _enteredName,
             'quantity': _enteredQuantity,
@@ -53,6 +53,10 @@ class _NewItemScreenState extends ConsumerState<NewItemScreen> {
       //   ),
       // );
 
+      if (!context.mounted) {
+        return;
+      }
+      print(response);
       Navigator.pop(context);
     }
     // print(_enteredName);
