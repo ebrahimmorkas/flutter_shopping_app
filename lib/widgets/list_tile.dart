@@ -3,6 +3,7 @@ import 'package:shopping_app/models/grocery_item.dart';
 import 'package:shopping_app/providers/grocery_items_list_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
+import 'package:shopping_app/screens/update_item_screen.dart';
 
 class Listtile extends ConsumerStatefulWidget {
   const Listtile({super.key, required this.groceryItem, required this.index});
@@ -36,11 +37,6 @@ class _ListtileState extends ConsumerState<Listtile> {
       // Error has taken place
       return;
     }
-  }
-
-  Future updateItem(GroceryItem item) async {
-    // final url = Uri.https('shopping-list-7df26-default-rtdb.firebaseio.com',
-    //     'shopping_list/${item.id}.json');
   }
 
   void undoDeletion(GroceryItem itemToBeDeleted, int indexOfItemToBeDeleted,
@@ -112,7 +108,15 @@ class _ListtileState extends ConsumerState<Listtile> {
             ),
             ElevatedButton(
               onPressed: () {
-                updateItem(widget.groceryItem);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return UpdateItemScreen(item: widget.groceryItem);
+                    },
+                  ),
+                );
+                // updateItem(widget.groceryItem);
               },
               child: Text('Update'),
             ),
