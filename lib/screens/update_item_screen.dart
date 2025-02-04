@@ -40,6 +40,8 @@ class _UpdateItemScreenState extends ConsumerState<UpdateItemScreen> {
       setState(() {
         isUpdating = true;
       });
+    } else {
+      return;
     }
 
     final url = Uri.https('shopping-list-7df26-default-rtdb.firebaseio.com',
